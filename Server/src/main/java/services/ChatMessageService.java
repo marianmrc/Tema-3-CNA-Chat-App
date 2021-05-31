@@ -20,7 +20,19 @@ public class ChatMessageService extends ChatMessageServiceGrpc.ChatMessageServic
         return new StreamObserver<ChatMessage>() {
             @Override
             public void onNext(ChatMessage chatMessage) {
+                String message = chatMessage.getMessage();
+                String from = chatMessage.getFrom();
 
+                for (StreamObserver<ChatMessage> observer : observers) {
+                    try {
+                        observer.onNext(ChatMessage.newBuilder()
+                                .setMessage(message).setFrom(from).build());
+                    } catch (StatusRuntimeException e) {
+                        synchronized (observers) {
+                            observers.remove(responseObserver);
+                        }
+                    }
+                }
             }
 
             @Override
@@ -30,8 +42,10 @@ public class ChatMessageService extends ChatMessageServiceGrpc.ChatMessageServic
 
             @Override
             public void onCompleted() {
-               
+
             }
         };
     }
 }
+
+         
