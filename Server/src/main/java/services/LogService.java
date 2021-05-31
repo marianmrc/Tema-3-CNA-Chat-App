@@ -52,7 +52,9 @@ public class LogService extends LogServiceGrpc.LogServiceImplBase {
 
             @Override
             public void onCompleted() {
-
+                synchronized (observers) {
+                    observers.remove(responseObserver);
+                }
             }
         };
     }
