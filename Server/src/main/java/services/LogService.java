@@ -45,7 +45,9 @@ public class LogService extends LogServiceGrpc.LogServiceImplBase {
 
             @Override
             public void onError(Throwable throwable) {
-               
+                synchronized (observers) {
+                    observers.remove(responseObserver);
+                }
             }
 
             @Override
