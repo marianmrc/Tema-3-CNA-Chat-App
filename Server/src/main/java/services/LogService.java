@@ -1,5 +1,6 @@
 package services;
 
+import io.grpc.StatusRuntimeException;
 import io.grpc.stub.StreamObserver;
 import proto.log.LogServiceGrpc;
 import proto.log.LogServiceOuterClass;
@@ -20,12 +21,31 @@ public class LogService extends LogServiceGrpc.LogServiceImplBase {
         return new StreamObserver<UserState>() {
             @Override
             public void onNext(UserState userState) {
+                String username = userState.getUsername();
+                String state = userState.getState();
 
+                if (state.equals("connected")) {
+                    System.out.println(username + " connected");
+                }
+                else {
+                    System.out.println(username + " disconnected");
+                }
+
+                for (StreamObserver<UserState> observer : observers) {
+                    try {
+                        observer.onNext(UserState.newBuilder()
+                                .setUsername(username).setState(state).build());
+                    } catch (StatusRuntimeException e) {
+                        synchronized (observers) {
+                            observers.remove(responseObserver);
+                        }
+                    }
+                }
             }
 
             @Override
             public void onError(Throwable throwable) {
-
+               
             }
 
             @Override
