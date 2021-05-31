@@ -37,15 +37,19 @@ public class ChatMessageService extends ChatMessageServiceGrpc.ChatMessageServic
 
             @Override
             public void onError(Throwable throwable) {
-
+                synchronized (observers) {
+                    observers.remove(responseObserver);
+                }
             }
 
             @Override
             public void onCompleted() {
-
+                synchronized (observers) {
+                    observers.remove(responseObserver);
+                }
             }
         };
     }
 }
 
-         
+
