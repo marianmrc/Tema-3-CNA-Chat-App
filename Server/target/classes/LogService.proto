@@ -1,0 +1,22 @@
+syntax = "proto3";
+
+option java_package = "proto.log";
+
+service LogService {
+  rpc log (stream UserState) returns (stream UserState) {}
+  rpc getLoggedUsers (UserRequest) returns (LoggedUsers) {}
+}
+
+message UserState {
+  string username = 1;
+  string state = 2;
+}
+
+message UserRequest {
+
+}
+
+message LoggedUsers {
+  repeated string users = 1;
+}
+
